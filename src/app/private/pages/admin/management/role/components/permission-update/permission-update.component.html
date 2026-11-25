@@ -1,0 +1,64 @@
+<app-generic-loading [isVisible]="isLoadingPermissions || isUpdatingPermission"
+  [message]="isUpdatingPermission ? 'Actualizando permisos...' : 'Cargando permisos...'"
+  [submessage]="'Esto puede tomar unos segundos'" [overlay]="true" [size]="'medium'" [variant]="'primary'"
+  [spinnerType]="'ring'" [showProgress]="isUpdatingPermission" [showSubmessage]="true">
+</app-generic-loading>
+
+<div class="row btn-page">
+  <div class="col-sm-12">
+    <div class="card">
+      <app-page-header icon="icon-lock" title="GESTIONAR PERMISOS"
+        subtitle="Active o desactive cada acción por módulo para este rol">
+        @if (permissionData) {
+        <span headerMeta class="badge badge-light-primary permission-role">Rol: {{ permissionData.roleName }}</span>
+        }
+        <button headerActions type="button" class="btn btn-light" (click)="goBack()">
+          <em class="feather icon-arrow-left"></em>Volver
+        </button>
+        <button headerActions type="button" class="btn btn-primary" [disabled]="disableRegisterButton"
+          (click)="EditPermissionByRoleId()">
+          <em class="feather icon-save"></em>ACTUALIZAR
+        </button>
+      </app-page-header>
+
+      <div class="card-body p-0">
+        <div class="table-responsive-wrapper">
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th class="sticky-col-header">Módulo / Entidad</th>
+                <th *ngFor="let action of actions">{{ action }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (!isLoadingPermissions && entities.length === 0) {
+              <tr>
+                <td [attr.colspan]="actions.length + 1" class="empty-cell">
+                  <div class="erp-empty erp-empty--compact">
+                    <span class="erp-empty__icon" aria-hidden="true"><em class="feather icon-lock"></em></span>
+                    <p class="erp-empty__text">No hay permisos para mostrar. Revise la respuesta de identity/role/permissions.</p>
+                  </div>
+                </td>
+              </tr>
+              }
+              <tr *ngFor="let entity of entities">
+                <td class="sticky-col">
+                  {{ entity }}
+                </td>
+                <td *ngFor="let action of actions">
+                  <div class="switch d-inline switch-primary">
+                    <input type="checkbox" [id]="'switch-' + entity + '-' + action"
+                      [checked]="permissionsMap[entity][action]?.selected"
+                      [disabled]="permissionsMap[entity][action]?.disabled"
+                      (change)="onCheckboxChange(entity, action, $event)">
+                    <label [for]="'switch-' + entity + '-' + action" class="cr"></label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

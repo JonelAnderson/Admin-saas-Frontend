@@ -1,0 +1,29 @@
+<div class="row btn-page">
+  <div class="col-sm-12">
+    <div class="card">
+      <app-page-header icon="icon-menu" title="GESTIÓN DE MENÚS"
+        subtitle="Opciones de navegación del sistema y su orden">
+        <app-filter-by-state headerFilters #stateFilter [currentMenu]="component.filters.stateFilter"
+          [items]="component.menuItems" (filterChange)="setData($event)">
+        </app-filter-by-state>
+
+        <app-search-box-multiple headerFilters #searchBox [searchOptions]="component.searchOptions"
+          (search)="search($event)" [currentValue]="component.filters.textFilter">
+        </app-search-box-multiple>
+
+        <app-button-reset-filters headerActions (buttonClick)="resetFilters()"></app-button-reset-filters>
+        @if (canCreate()) {
+        <button headerActions type="button" class="btn btn-primary" matTooltip="Agregar" (click)="OpenModalRegister()">
+          <em class="feather icon-plus"></em>AGREGAR
+        </button>
+        }
+      </app-page-header>
+
+      <div class="card-body p-0">
+        <app-list-table #listTable (actionTriggered)="onAction($event)" [service]="_menuService"
+          [columns]="component.TABLE_COLUMNS" [getInputs]="getInputs()" [actions]="tableActions">
+        </app-list-table>
+      </div>
+    </div>
+  </div>
+</div>

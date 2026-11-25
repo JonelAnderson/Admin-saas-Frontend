@@ -1,0 +1,186 @@
+<div class="row btn-page">
+  @if (canSeeDashboard) {
+  <div class="col-sm-12">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h4 class="mb-0">Tablero</h4>
+        @if (dashboard(); as d) {
+        <small class="text-muted">Hoy {{ ymd(d.today) }} (hora de Lima)</small>
+        }
+      </div>
+      <button type="button" class="btn btn-light-primary btn-sm" [disabled]="loading()" (click)="reload()">
+        <em class="feather icon-refresh-cw me-1"></em>Actualizar
+      </button>
+    </div>
+
+    @if (loading() && !dashboard()) {
+    <div class="card"><div class="card-body text-center py-5 text-muted">
+      <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>Cargando tablero…
+    </div></div>
+    }
+    @if (error()) {
+    <div class="alert alert-warning d-flex align-items-center justify-content-between" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" class="btn btn-sm btn-outline-warning" (click)="reload()">Reintentar</button>
+    </div>
+    }
+
+    @if (dashboard(); as d) {
+    <div class="row g-3 mb-3">
+      <!-- Clientes por estado de suscripción -->
+      <div class="col-md-6 col-xl-4">
+        <div class="card h-100 mb-0">
+          <div class="card-body">
+            <h6 class="mb-3">Suscripciones <small class="text-muted">· {{ d.customers }} clientes</small></h6>
+            @for (s of d.subscriptionsByStatus; track s.status) {
+            <a class="d-flex justify-content-between align-items-center text-decoration-none py-1" routerLink="/private/billing/subscriptions">
+              <span class="text-body"><span class="badge badge-light-{{ statusColor[s.status] }} me-2">&nbsp;</span>{{ s.name }}</span>
+              <strong>{{ s.count }}</strong>
+            </a>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Cobrado del mes -->
+      <div class="col-md-6 col-xl-4">
+        <div class="card h-100 mb-0">
+          <div class="card-body">
+            <h6 class="mb-3">Cobrado este mes</h6>
+            @for (r of d.monthRevenue; track r.currency) {
+            <div class="d-flex justify-content-between align-items-baseline py-1">
+              <span class="f-20 fw-semibold">{{ money(r.currency, r.amount) }}</span>
+              <small class="text-muted">{{ r.payments }} {{ r.payments === 1 ? 'pago' : 'pagos' }}</small>
+            </div>
+            } @empty {
+            <p class="text-muted mb-0">Todavía no hay pagos este mes.</p>
+            }
+            <a class="small" routerLink="/private/billing/payments">Ver pagos</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bandejas con fallos -->
+      <div class="col-md-12 col-xl-4">
+        <div class="card h-100 mb-0">
+          <div class="card-body">
+            <h6 class="mb-3">Pide atención</h6>
+            <a class="d-flex justify-content-between align-items-center text-decoration-none py-1" routerLink="/private/api-sunat/remote-actions">
+              <span class="text-body">Acciones remotas fallidas o abandonadas</span>
+              <span class="badge" [class.badge-light-danger]="d.remoteActionsNeedingAttention > 0" [class.badge-light-success]="d.remoteActionsNeedingAttention === 0">{{ d.remoteActionsNeedingAttention }}</span>
+            </a>
+            <a class="d-flex justify-content-between align-items-center text-decoration-none py-1" routerLink="/private/billing/notifications">
+              <span class="text-body">Avisos por correo fallidos o abandonados</span>
+              <span class="badge" [class.badge-light-danger]="d.notificationsNeedingAttention > 0" [class.badge-light-success]="d.notificationsNeedingAttention === 0">{{ d.notificationsNeedingAttention }}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <!-- Vencimientos de la semana -->
+      <div class="col-xl-6">
+        <div class="card h-100 mb-0">
+          <div class="card-body">
+            <h6 class="mb-3">Vencimientos de los próximos 7 días</h6>
+            @if (d.dueThisWeek.length) {
+            <div class="table-responsive">
+              <table class="table table-sm align-middle mb-0">
+                <thead><tr><th>Cliente</th><th>Servicio</th><th>Qué pasa</th><th>Cuándo</th></tr></thead>
+                <tbody>
+                  @for (x of d.dueThisWeek; track x.subscriptionId) {
+                  <tr>
+                    <td><a routerLink="/private/billing/subscriptions" [queryParams]="{ customerId: x.customerId, customer: x.customerName }">{{ x.customerName }}</a></td>
+                    <td>{{ x.productName }} · {{ x.planName }}</td>
+                    <td><span class="badge" [class.badge-light-warning]="x.event === 'Vence'" [class.badge-light-danger]="x.event !== 'Vence'">{{ x.event }}</span></td>
+                    <td>{{ ymd(x.date) }} <small class="text-muted">({{ daysText(x.daysLeft) }})</small></td>
+                  </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            } @else {
+            <p class="text-muted mb-0">No vence ni se suspende nada esta semana.</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Instancias del ERP -->
+      <div class="col-xl-6">
+        <div class="card h-100 mb-0">
+          <div class="card-body">
+            <h6 class="mb-3">Instancias del ERP <small class="text-muted">· {{ d.instancesTotal }} en total @if (d.latestVersion) { · última versión {{ d.latestVersion }} }</small></h6>
+            <p class="fw-semibold small mb-1">Sin contacto desde hace más de un día</p>
+            @for (i of d.instancesWithoutContact; track i.id) {
+            <div class="d-flex justify-content-between py-1">
+              <a routerLink="/private/erp/instances" [queryParams]="{ customerId: i.customerId, customer: i.customerName }">{{ i.customerName }} · {{ i.name }}</a>
+              <small class="text-muted">{{ i.contactName }}@if (i.lastContactOnUtc) { · {{ lima(i.lastContactOnUtc) }} }</small>
+            </div>
+            } @empty {
+            <p class="text-muted small">Todas se conectaron en el último día.</p>
+            }
+            <p class="fw-semibold small mt-3 mb-1">Con versión desactualizada</p>
+            @for (i of d.instancesOutdated; track i.id) {
+            <div class="d-flex justify-content-between py-1">
+              <a routerLink="/private/erp/instances" [queryParams]="{ customerId: i.customerId, customer: i.customerName }">{{ i.customerName }} · {{ i.name }}</a>
+              <small class="text-muted">{{ i.version }}</small>
+            </div>
+            } @empty {
+            <p class="text-muted small mb-0">Ninguna.</p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API SUNAT -->
+    <div class="card mb-3">
+      <div class="card-body">
+        <h6 class="mb-3">API SUNAT</h6>
+        @if (d.api?.available) {
+        <div class="row g-3 text-center">
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold">{{ d.api!.tenantsActive }}</div><small class="text-muted">Empresas activas</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold">{{ d.api!.documentsThisMonth }}</div><small class="text-muted">Comprobantes del mes</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold" [class.text-danger]="(d.api!.rejectedToday ?? 0) > 0">{{ d.api!.rejectedToday ?? '—' }}</div><small class="text-muted">Rechazos de hoy</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold">{{ d.api!.rejectedThisMonth }}</div><small class="text-muted">Rechazos del mes</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold" [class.text-warning]="d.api!.certificatesExpiring > 0">{{ d.api!.certificatesExpiring }}</div><small class="text-muted">Certificados por vencer</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold" [class.text-danger]="d.api!.certificatesBroken > 0">{{ d.api!.certificatesBroken }}</div><small class="text-muted">Certificados vencidos o rotos</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold">{{ d.api!.pendingNow }}</div><small class="text-muted">Pendientes en SUNAT</small></div>
+          <div class="col-6 col-md-3 col-xl"><div class="f-24 fw-semibold" [class.text-danger]="d.api!.failedJobs > 0">{{ d.api!.failedJobs }}</div><small class="text-muted">Trabajos fallidos</small></div>
+        </div>
+        } @else {
+        <p class="text-muted small mb-0">
+          <em class="feather icon-cloud-off me-1"></em>No se pudo consultar la API SUNAT ahora@if (d.api?.error) { ({{ d.api!.error }}) }. El resto del tablero no depende de ella.
+        </p>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-body py-5 text-center">
+        <em class="feather icon-grid f-40 text-primary d-block mb-2"></em>
+        <h4 class="mb-1">Consola de plataforma</h4>
+        <p class="text-muted mb-4">Clientes, planes, suscripciones y cobros del ERP y de la API SUNAT.</p>
+        <div class="row g-3 justify-content-center">
+          @for (s of shortcuts; track s.url) {
+          <div class="col-sm-6 col-lg-4 col-xl-3">
+            <a class="card h-100 text-decoration-none border shadow-none mb-0" [routerLink]="s.url">
+              <div class="card-body text-start">
+                <em class="feather {{ s.icon }} f-24 text-primary d-block mb-2"></em>
+                <h6 class="mb-1">{{ s.label }}</h6>
+                <p class="text-muted small mb-0">{{ s.description }}</p>
+              </div>
+            </a>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

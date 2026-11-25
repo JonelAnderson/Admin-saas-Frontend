@@ -1,0 +1,73 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-briefcase"></em>{{ customerId ? 'Editar' : 'Nuevo' }} cliente</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="erp-form" novalidate>
+    <p class="form-text mt-0 mb-3">Los campos marcados con <span class="erp-required">*</span> son obligatorios.</p>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-hash"></em>Empresa</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="customer-ruc">RUC <span class="erp-required">*</span></label>
+          <input id="customer-ruc" class="form-control" formControlName="ruc" maxlength="11" inputmode="numeric" autocomplete="off"
+            [class.is-invalid]="invalid('ruc')" />
+          @if (invalid('ruc')) {
+          <div class="invalid-feedback">RUC de 11 dígitos válido (revise el dígito verificador).</div>
+          }
+        </div>
+        <div class="col-md-8">
+          <label class="form-label" for="customer-name">Razón social <span class="erp-required">*</span></label>
+          <input id="customer-name" class="form-control" formControlName="businessName" [class.is-invalid]="invalid('businessName')" />
+          @if (invalid('businessName')) {
+          <div class="invalid-feedback">Indique la razón social.</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="customer-trade">Nombre comercial</label>
+          <input id="customer-trade" class="form-control" formControlName="tradeName" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="customer-address">Dirección</label>
+          <input id="customer-address" class="form-control" formControlName="address" />
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-user"></em>Contacto principal <small class="text-muted">(avisos de cobro)</small></h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="customer-contact">Nombre</label>
+          <input id="customer-contact" class="form-control" formControlName="contactName" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="customer-email">Correo</label>
+          <input id="customer-email" type="email" class="form-control" formControlName="contactEmail" [class.is-invalid]="invalid('contactEmail')" />
+          @if (invalid('contactEmail')) {
+          <div class="invalid-feedback">Correo no válido.</div>
+          }
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="customer-phone">Celular</label>
+          <input id="customer-phone" class="form-control" formControlName="contactPhone" [class.is-invalid]="invalid('contactPhone')" />
+          @if (invalid('contactPhone')) {
+          <div class="invalid-feedback">Solo números, espacios y un + inicial.</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="customer-notes">Notas</label>
+          <textarea id="customer-notes" class="form-control" rows="2" formControlName="notes" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+    </section>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="save()">
+    @if (saving()) {<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>}
+    Guardar
+  </button>
+</div>

@@ -1,0 +1,61 @@
+<div class="row btn-page">
+  <div class="col-12">
+    <div class="card">
+      <app-page-header icon="icon-users" title="ASIGNAR ROLES"
+        subtitle="Marque los roles que tendrá el usuario">
+        <span *ngIf="userName" headerMeta class="badge badge-light-primary user-role-name">Usuario: {{userName}}</span>
+        <button headerActions type="button" class="btn btn-light" (click)="goBack()">
+          <em class="feather icon-arrow-left"></em>Volver
+        </button>
+        <button headerActions type="button" class="btn btn-primary" [disabled]="!isAnyCheckboxChecked" (click)="UpdateRoleUser()">
+          <em class="feather icon-save"></em>ACTUALIZAR
+        </button>
+      </app-page-header>
+
+      <div class="card-body p-0">
+        <div class="table-responsive-wrapper">
+          <ngx-spinner bdColor="rgba(51,51,51,0.8)" name="show-permissions" size="medium" color="#fff"
+            type="ball-scale-multiple" [fullScreen]="false">
+          </ngx-spinner>
+          <table class="premium-table">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th class="text-start">Nombre del Rol</th>
+                <th class="text-start">Descripción</th>
+                <th>Seleccionar</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="roleData != null && roleData.length > 0; else noData">
+                <tr *ngFor="let item of roleData; let i = index" [class.is-selected]="selectedStates[i]">
+                  <td class="text-muted small">{{i+1}}</td>
+                  <td class="text-start"><span class="role-name">{{item.roleName}}</span></td>
+                  <td class="text-start"><span class="text-muted">{{item.roleDescription}}</span></td>
+                  <td>
+                    <div class="switch d-inline switch-primary">
+                      <input type="checkbox" [id]="'switch-role-' + i" [(ngModel)]="selectedStates[i]"
+                        [checked]="stateValue[i]" (change)="onCheckboxChange()">
+                      <label [for]="'switch-role-' + i" class="cr"></label>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+
+              <ng-template #noData>
+                <tr *ngIf="roleData == null || roleData.length === 0">
+                  <td colspan="4" class="p-0">
+                    <div class="erp-empty">
+                      <span class="erp-empty__icon" aria-hidden="true"><em class="feather icon-shield"></em></span>
+                      <p class="erp-empty__text">No se encontraron roles disponibles para asignar.</p>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

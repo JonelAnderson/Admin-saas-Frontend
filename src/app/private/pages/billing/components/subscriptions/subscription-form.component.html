@@ -1,0 +1,93 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-repeat"></em>{{ subscriptionId ? 'Editar' : 'Nueva' }} suscripción</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="erp-form" novalidate>
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-briefcase"></em>Cliente y plan</h6>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="sub-customer">Cliente <span class="erp-required">*</span></label>
+          @if (editing(); as s) {
+          <input id="sub-customer" class="form-control" [value]="s.customerName + ' (' + s.customerRuc + ')'" disabled />
+          } @else {
+          <ng-select labelForId="sub-customer" [items]="picker.items()" bindLabel="label" bindValue="id" formControlName="customerId"
+            [typeahead]="picker.search$" [loading]="picker.loading()" placeholder="Escriba RUC o razón social" appendTo="body"
+            [class.is-invalid]="invalid('customerId')" />
+          @if (invalid('customerId')) {
+          <div class="invalid-feedback d-block">Seleccione el cliente.</div>
+          }
+          }
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="sub-product">Producto <span class="erp-required">*</span></label>
+          <ng-select labelForId="sub-product" [items]="products" bindLabel="name" bindValue="id" formControlName="product" [clearable]="false"
+            (change)="onProductChange($event.id)" />
+          @if (editing()) {
+          <div class="form-text">Para otro producto, cree otra suscripción.</div>
+          }
+        </div>
+        <div class="col-md-8">
+          <label class="form-label" for="sub-plan">Plan <span class="erp-required">*</span></label>
+          <ng-select labelForId="sub-plan" [items]="plans()" bindLabel="name" bindValue="id" formControlName="planId" placeholder="Seleccionar plan"
+            [class.is-invalid]="invalid('planId')">
+            <ng-template ng-option-tmp let-item="item">
+              {{ item.name }} <small class="text-muted">· {{ item.code }} · {{ money(item.currency, item.monthlyPrice) }} / mes</small>
+            </ng-template>
+          </ng-select>
+          @if (invalid('planId')) {
+          <div class="invalid-feedback d-block">Seleccione un plan activo.</div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-calendar"></em>Condiciones</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="sub-cycle">Ciclo <span class="erp-required">*</span></label>
+          <ng-select labelForId="sub-cycle" [items]="cycles" bindLabel="name" bindValue="id" formControlName="billingCycle" [clearable]="false" />
+        </div>
+        @if (!editing()) {
+        <div class="col-md-4">
+          <label class="form-label" for="sub-start">Inicio</label>
+          <input id="sub-start" type="date" class="form-control" formControlName="startOn" />
+        </div>
+        }
+        <div class="col-md-4">
+          <label class="form-label" for="sub-price">Precio pactado @if (editing()) {<span class="erp-required">*</span>}</label>
+          <input id="sub-price" type="number" min="0" step="0.01" class="form-control" formControlName="price" [class.is-invalid]="invalid('price')"
+            [placeholder]="selectedPlan ? 'Del plan: ' + money(selectedPlan.currency, selectedPlan.monthlyPrice) + ' / mes' : 'Del plan'" />
+          <div class="form-text">Por ciclo, sin IGV. Vacío = precio del plan.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="sub-day">Día de vencimiento @if (editing()) {<span class="erp-required">*</span>}</label>
+          <input id="sub-day" type="number" min="1" max="28" class="form-control" formControlName="billingDay" [class.is-invalid]="invalid('billingDay')"
+            placeholder="El día del inicio" />
+          <div class="form-text">1 a 28.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="sub-grace">Días de gracia <span class="erp-required">*</span></label>
+          <input id="sub-grace" type="number" min="0" max="30" class="form-control" formControlName="graceDays" [class.is-invalid]="invalid('graceDays')" />
+          <div class="form-text">Entra con aviso antes de suspender.</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="sub-notes">Notas</label>
+          <textarea id="sub-notes" class="form-control" rows="2" formControlName="notes" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+      @if (!editing()) {
+      <p class="form-text mb-0 mt-2">La prueba gratuita del plan se aplica solo la primera vez que el cliente contrata este producto.</p>
+      }
+    </section>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="save()">
+    @if (saving()) {<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>}
+    Guardar
+  </button>
+</div>

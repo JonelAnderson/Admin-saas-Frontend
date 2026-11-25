@@ -1,0 +1,98 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-user"></em>Actualizar Usuario</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.close()"></button>
+</div>
+
+<div class="modal-body">
+  <div class="erp-form" [formGroup]="form">
+    <p class="form-text mt-0 mb-3">Los campos marcados con <span class="erp-required">*</span> son obligatorios.</p>
+
+    <!-- Datos personales -->
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-user"></em>Datos personales</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-first-name">Nombres <span class="erp-required" aria-hidden="true">*</span></label>
+          <input matInput id="update-profile-first-name" formControlName="firstName" class="form-control" placeholder="Ingrese nombres"
+            [ngClass]="{'is-invalid': isFieldInvalid('firstName') }" />
+          @if (isFieldInvalid('firstName')) {
+          <div class="invalid-feedback">{{ getErrorMessage('firstName') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-last-name">Apellidos <span class="erp-required" aria-hidden="true">*</span></label>
+          <input matInput id="update-profile-last-name" formControlName="lastName" class="form-control" placeholder="Ingrese apellidos"
+            [ngClass]="{'is-invalid': isFieldInvalid('lastName') }" />
+          @if (isFieldInvalid('lastName')) {
+          <div class="invalid-feedback">{{ getErrorMessage('lastName') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-email">Correo <span class="erp-required" aria-hidden="true">*</span></label>
+          <input matInput id="update-profile-email" formControlName="email" class="form-control" placeholder="Ingrese correo"
+            autocomplete="off" [ngClass]="{'is-invalid': isFieldInvalid('email') }" />
+          @if (isFieldInvalid('email')) {
+          <div class="invalid-feedback">{{ getErrorMessage('email') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-phone">Teléfono <span class="erp-required" aria-hidden="true">*</span></label>
+          <input matInput id="update-profile-phone" formControlName="phoneNumber" class="form-control" placeholder="Ingrese teléfono"
+            [ngClass]="{'is-invalid': isFieldInvalid('phoneNumber') }" />
+          @if (isFieldInvalid('phoneNumber')) {
+          <div class="invalid-feedback">{{ getErrorMessage('phoneNumber') }}</div>
+          } @else {
+          <div class="form-text">De 9 a 12 dígitos.</div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Acceso y organización -->
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-key"></em>Acceso y organización</h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-user-login">Usuario <span class="erp-required" aria-hidden="true">*</span></label>
+          <input matInput id="update-profile-user-login" formControlName="userLogin" class="form-control" placeholder="Ingrese usuario"
+            autocomplete="off" [ngClass]="{'is-invalid': isFieldInvalid('userLogin') }" />
+          @if (isFieldInvalid('userLogin')) {
+          <div class="invalid-feedback">{{ getErrorMessage('userLogin') }}</div>
+          }
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="update-profile-reports-to">Reporta a <span class="erp-required" aria-hidden="true">*</span></label>
+          <ng-select #shift labelForId="update-profile-reports-to" [items]="UserData" [selectOnTab]="true" bindValue="id" bindLabel="userFullName"
+            placeholder="Seleccionar superior" formControlName="userId"
+            [ngClass]="{'is-invalid': isFieldInvalid('userId') }">
+          </ng-select>
+          @if (isFieldInvalid('userId')) {
+          <div class="invalid-feedback d-block">{{ getErrorMessage('userId') }}</div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Imagen -->
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-image"></em>Imagen de perfil <small class="fw-normal text-muted text-lowercase">(opcional)</small></h6>
+      <div class="profile-upload">
+        <vex-file-selector [currentUrlPhoto]="currentUrlPhoto" [accept]="['.jpg', '.jpeg', '.png', '.webp']"
+          [maxFiles]="1" [isImage]="true" [convertToWebP]="true"
+          dragDropText="Arrastra y suelta el archivo o haz clic aquí" clickText="Haz clic aquí para elegir un archivo"
+          (fileSelected)="selectedFile($event)">
+        </vex-file-selector>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.close()">CANCELAR</button>
+  <button type="button" class="btn btn-primary" [disabled]=" disableRegisterButton()" (click)="updateProfile()">
+    @if (disableRegisterButton()) {
+    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+    }
+    <span>{{disableRegisterButton() ? 'Loading...' : 'GUARDAR'}}</span>
+  </button>
+</div>

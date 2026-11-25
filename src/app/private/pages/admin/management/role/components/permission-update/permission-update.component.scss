@@ -1,0 +1,104 @@
+:host {
+  display: block;
+}
+
+.permission-role {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+// Tabla con desplazamiento propio (la página no se desplaza en horizontal)
+.table-responsive-wrapper {
+  overflow: auto;
+  max-height: calc(100vh - 260px);
+  position: relative;
+  border-bottom-left-radius: var(--erp-radius);
+  border-bottom-right-radius: var(--erp-radius);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--erp-surface-muted);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--erp-border-strong);
+    border-radius: 4px;
+  }
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 800px;
+
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    padding: 0.75rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--erp-text-muted);
+    background-color: var(--erp-primary-softer);
+    border-bottom: 1px solid var(--erp-border);
+    text-align: center;
+    white-space: nowrap;
+
+    &.sticky-col-header {
+      left: 0;
+      z-index: 20;
+      text-align: left;
+      padding-left: 1.25rem;
+      border-right: 1px solid var(--erp-border);
+    }
+  }
+
+  tbody tr {
+    transition: background-color 0.15s ease;
+
+    td {
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--erp-border);
+      color: var(--erp-text);
+      vertical-align: middle;
+      text-align: center;
+      background-color: var(--erp-surface);
+
+      &.sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        border-right: 1px solid var(--erp-border);
+        text-align: left;
+        padding-left: 1.25rem;
+        font-weight: 600;
+        color: var(--erp-primary-dark);
+        font-size: 0.875rem;
+      }
+
+      &.empty-cell {
+        padding: 0;
+      }
+    }
+
+    &:hover td {
+      background-color: var(--erp-primary-softer);
+    }
+  }
+}
+
+.switch.d-inline {
+  display: inline-flex !important;
+  justify-content: center;
+  align-items: center;
+  min-height: 20px;
+}

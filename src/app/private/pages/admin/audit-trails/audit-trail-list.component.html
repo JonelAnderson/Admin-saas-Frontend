@@ -1,0 +1,22 @@
+<div class="row btn-page">
+  <div class="col-sm-12">
+    <div class="card">
+      <app-page-header icon="icon-eye" title="AUDITORÍA"
+        subtitle="Quién creó, modificó o eliminó cada registro, en todas las empresas"
+        help="Cada guardado del sistema deja aquí una fila con el usuario, la fecha y hora (de Lima), la entidad y los valores antes y después. Solo la ve el SuperAdmin. Use Ver detalle para comparar los campos.">
+        <app-filter-select headerFilters #tableFilter [items]="tables()" placeholder="Entidad" (filterChange)="onTable($event)"></app-filter-select>
+        <app-filter-select headerFilters #typeFilter [items]="types" placeholder="Acción" minWidth="150px" (filterChange)="onType($event)"></app-filter-select>
+        <app-filter-date-range-ymd headerFilters #dateFilter [start]="from()" [end]="to()" (rangeDate)="onDates($event)"></app-filter-date-range-ymd>
+        <app-search-box-multiple headerFilters #searchBox [searchOptions]="searchOptions" (search)="search($event)"></app-search-box-multiple>
+        <app-button-reset-filters headerActions (buttonClick)="reset()"></app-button-reset-filters>
+        <button headerActions type="button" class="btn btn-outline-primary" (click)="refresh()" aria-label="Actualizar">
+          <em class="feather icon-refresh-cw"></em>Actualizar
+        </button>
+      </app-page-header>
+      <div class="card-body p-0">
+        <app-list-table [service]="audits" [columns]="columns" [getInputs]="getInputs()" [actions]="actions"
+          (actionTriggered)="onAction($event)"></app-list-table>
+      </div>
+    </div>
+  </div>
+</div>

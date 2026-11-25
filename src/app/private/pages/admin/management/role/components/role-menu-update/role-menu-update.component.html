@@ -1,0 +1,94 @@
+<div class="row btn-page">
+  <div class="col-sm-12">
+    <div class="card">
+      <app-page-header icon="icon-list" title="ASIGNACIÓN DE MENÚS"
+        subtitle="Menús visibles para el rol">
+        <button headerActions type="button" class="btn btn-light" (click)="goBack()">
+          <em class="feather icon-arrow-left"></em>Volver
+        </button>
+      </app-page-header>
+
+      <div class="card-body">
+        @if (isLoading) {
+        <app-generic-loading [isVisible]="true" [overlay]="false" message="Cargando menús..." />
+        } @else {
+        <div class="erp-callout" role="note">
+          <em class="feather icon-info" aria-hidden="true"></em>
+          <div>
+            Seleccione los menús que estarán visibles para este rol. Los menús seleccionados permitirán al usuario
+            acceder a las respectivas secciones del sistema.
+          </div>
+        </div>
+
+        <div class="menus-container mt-3">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width: 50px;" class="text-center">#</th>
+                  <th>Icono</th>
+                  <th>Título del Menú</th>
+                  <th>Tipo</th>
+                  <th class="text-center">Permitido</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (menu of allMenus; track menu.id; let i = $index) {
+                <tr [class.menu-row--selected]="isMenuSelected(menu.id)">
+                  <td class="text-center text-muted small">{{ i + 1 }}</td>
+                  <td>
+                    <span class="menu-icon"><em class="{{ menu.icon }}"></em></span>
+                  </td>
+                  <td>
+                    <div class="fw-medium">{{ menu.title }}</div>
+                    <div class="text-muted small">{{ menu.url || '---' }}</div>
+                  </td>
+                  <td>
+                    <span class="badge" [class.badge-light-primary]="menu.type === 'item'"
+                      [class.badge-light-info]="menu.type === 'collapse'" [class.badge-light-secondary]="menu.type === 'group'">
+                      {{ menu.type | uppercase }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="form-check form-switch d-inline-block mb-0">
+                      <input class="form-check-input custom-switch" type="checkbox"
+                        [attr.aria-label]="'Permitir ' + menu.title"
+                        [checked]="isMenuSelected(menu.id)"
+                        (change)="onCheckboxChange(menu.id, $event)">
+                    </div>
+                  </td>
+                </tr>
+                } @empty {
+                <tr>
+                  <td colspan="5" class="p-0">
+                    <div class="erp-empty">
+                      <span class="erp-empty__icon" aria-hidden="true"><em class="feather icon-folder"></em></span>
+                      <p class="erp-empty__text">No se encontraron menús configurados.</p>
+                    </div>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end flex-wrap gap-2 mt-3 pt-3 border-top">
+          <button type="button" class="btn btn-light" (click)="goBack()" [disabled]="isUpdating">
+            CANCELAR
+          </button>
+          <button type="button" class="btn btn-primary" (click)="saveChanges()"
+            [disabled]="disableRegisterButton || isUpdating">
+            @if (isUpdating) {
+            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            GUARDANDO...
+            } @else {
+            <em class="feather icon-save"></em>GUARDAR CAMBIOS
+            }
+          </button>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

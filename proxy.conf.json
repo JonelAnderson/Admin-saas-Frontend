@@ -1,0 +1,9 @@
+{
+  "/api": {
+    "target": "https://localhost:5011",
+    "secure": false,
+    "changeOrigin": false,
+    "logLevel": "warn"
+  },
+  "/Usuarios": { "target": "https://localhost:5011", "secure": false, "changeOrigin": false }
+}

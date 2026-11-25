@@ -1,0 +1,96 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-plus-square"></em>Registrar Menú</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.close()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="erp-form">
+    <p class="form-text mt-0 mb-3">Los campos marcados con <span class="erp-required">*</span> son obligatorios.</p>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-menu"></em>Datos del menú</h6>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="menu-register-title">Título <span class="erp-required" aria-hidden="true">*</span></label>
+          <input id="menu-register-title" type="text" class="form-control" formControlName="title"
+            [class.is-invalid]="form.get('title').invalid && form.get('title').touched"
+            placeholder="Ingrese el título del menú">
+          <div class="invalid-feedback">{{getErrorMessage('title')}}</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="menu-register-type">Tipo <span class="erp-required" aria-hidden="true">*</span></label>
+          <ng-select labelForId="menu-register-type" [items]="typeData" bindLabel="name" bindValue="id" formControlName="type"
+            [clearable]="false">
+          </ng-select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="menu-register-parent">Menú Padre</label>
+          <ng-select labelForId="menu-register-parent" [items]="menuData" bindLabel="title" bindValue="id" formControlName="menuParentId"
+            placeholder="Ninguno (Raíz)">
+          </ng-select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="menu-register-url">URL</label>
+          <input id="menu-register-url" type="text" class="form-control" formControlName="url" placeholder="/ruta/del/menu">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="menu-register-icon">Icono</label>
+          <div class="input-group">
+            <span class="input-group-text menu-icon-preview" aria-hidden="true"><em [class]="form.get('icon')?.value || 'feather icon-circle'"></em></span>
+            <input id="menu-register-icon" type="text" class="form-control" formControlName="icon" placeholder="mat:icon-name">
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="menu-register-order">Orden <span class="erp-required" aria-hidden="true">*</span></label>
+          <input id="menu-register-order" type="number" class="form-control text-end" formControlName="order"
+            [class.is-invalid]="form.get('order').invalid && form.get('order').touched">
+          <div class="invalid-feedback">{{getErrorMessage('order')}}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-sliders"></em>Comportamiento</h6>
+      <div class="row g-2">
+        <div class="col-sm-6">
+          <div class="form-check erp-check-card">
+            <input class="form-check-input" type="checkbox" formControlName="hidden" id="checkHidden">
+            <label class="form-check-label" for="checkHidden">Oculto</label>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-check erp-check-card">
+            <input class="form-check-input" type="checkbox" formControlName="disabled" id="checkDisabled">
+            <label class="form-check-label" for="checkDisabled">Deshabilitado</label>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-check erp-check-card">
+            <input class="form-check-input" type="checkbox" formControlName="exactMatch" id="checkExact">
+            <label class="form-check-label" for="checkExact">Coincidencia Exacta</label>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-check erp-check-card">
+            <input class="form-check-input" type="checkbox" formControlName="external" id="checkExternal">
+            <label class="form-check-label" for="checkExternal">Enlace Externo</label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.close()">CANCELAR</button>
+  <button type="button" class="btn btn-primary" [disabled]=" disableRegisterButton()" (click)="menuRegister()">
+    @if (disableRegisterButton()) {
+    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+    }
+    <span>{{disableRegisterButton() ? 'Loading...' : 'REGISTRAR'}}</span>
+  </button>
+</div>

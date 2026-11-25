@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-shield"></em>Registrar Rol</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.close()"></button>
+</div>
+<div class="modal-body" [formGroup]="form">
+  <div class="erp-form">
+    <p class="form-text mt-0 mb-3">Los campos marcados con <span class="erp-required">*</span> son obligatorios.</p>
+    <div class="row g-3">
+      <div class="col-12">
+        <label class="form-label" for="role-register-name">Nombre <span class="erp-required" aria-hidden="true">*</span></label>
+        <input matInput id="role-register-name" formControlName="name" class="form-control" autocomplete="off"
+          [ngClass]="{'is-invalid': isFieldInvalid('name') }" />
+        @if (isFieldInvalid('name')) {
+        <div class="invalid-feedback">{{ getErrorMessage('name') || 'No use espacios en el nombre.' }}</div>
+        } @else {
+        <div class="form-text">Entre 4 y 100 caracteres, sin espacios.</div>
+        }
+      </div>
+      <div class="col-12">
+        <label class="form-label" for="role-register-description">Descripción <span class="erp-required" aria-hidden="true">*</span></label>
+        <input matInput id="role-register-description" formControlName="description" class="form-control"
+          [ngClass]="{'is-invalid': isFieldInvalid('description') }" />
+        @if (isFieldInvalid('description')) {
+        <div class="invalid-feedback">{{ getErrorMessage('description') || 'Use solo letras (sin tildes) y espacios.' }}</div>
+        } @else {
+        <div class="form-text">Entre 4 y 255 caracteres; solo letras (sin tildes) y espacios.</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.close()">CANCELAR</button>
+  <button type="button" class="btn btn-primary" [disabled]="disableRegisterButton" (click)="RoleRegister()">
+    @if (disableRegisterButton) {
+    <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+    }
+    <span>{{disableRegisterButton ? 'Loading...' : 'REGISTRAR'}}</span>
+  </button>
+</div>

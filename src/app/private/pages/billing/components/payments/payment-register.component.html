@@ -1,0 +1,85 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-dollar-sign"></em>Registrar pago</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="erp-form" novalidate>
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-repeat"></em>Suscripción</h6>
+      <div class="row g-3">
+        @if (!presetSubscription) {
+        <div class="col-md-6">
+          <label class="form-label" for="pay-customer">Cliente <span class="erp-required">*</span></label>
+          <ng-select labelForId="pay-customer" [items]="picker.items()" bindLabel="label" bindValue="id" formControlName="customerId"
+            [typeahead]="picker.search$" [loading]="picker.loading()" placeholder="Escriba RUC o razón social" appendTo="body"
+            (change)="onCustomerChange($event?.id ?? null)" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="pay-subscription">Suscripción <span class="erp-required">*</span></label>
+          <ng-select labelForId="pay-subscription" [items]="subscriptionOptions()" bindValue="id" formControlName="subscriptionId"
+            [searchable]="false" placeholder="Seleccione el cliente primero" (change)="onSubscriptionChange()" [class.is-invalid]="invalid('subscriptionId')">
+            <ng-template ng-label-tmp let-item="item">{{ item.productName }} · {{ item.planName }}</ng-template>
+            <ng-template ng-option-tmp let-item="item">{{ item.productName }} · {{ item.planName }} <small class="text-muted">({{ item.statusName }})</small></ng-template>
+          </ng-select>
+          @if (invalid('subscriptionId')) {
+          <div class="invalid-feedback d-block">Seleccione la suscripción (una por producto).</div>
+          }
+        </div>
+        }
+        @if (selected; as s) {
+        <div class="col-12">
+          <div class="alert alert-light border mb-0 py-2">
+            <strong>{{ s.customerName }}</strong> · {{ s.productName }} · {{ s.planName }} · {{ s.priceText }}<br />
+            Estado: <span class="badge {{ s.badgeColor }}">{{ s.statusName }}</span>
+            · Cubierto hasta <strong>{{ s.coveredUntilText }}</strong>
+            @if (s.suspendOnText) { · se suspende el {{ s.suspendOnText }} }
+            <div class="small text-muted mt-1">El pago cubre desde el día siguiente a "cubierto hasta" (o desde hoy si estuvo suspendida más allá de la gracia).</div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-credit-card"></em>Pago</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="pay-date">Fecha del pago <span class="erp-required">*</span></label>
+          <input id="pay-date" type="date" class="form-control" formControlName="paidOn" [max]="today" [class.is-invalid]="invalid('paidOn')" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="pay-periods">Ciclos que paga <span class="erp-required">*</span></label>
+          <input id="pay-periods" type="number" min="1" max="24" class="form-control" formControlName="periods" [class.is-invalid]="invalid('periods')" />
+          <div class="form-text">{{ selected?.billingCycleName === 'Anual' ? 'Años' : 'Meses' }} (1 a 24).</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="pay-amount">Monto {{ selected?.currency ?? '' }} <span class="erp-required">*</span></label>
+          <input id="pay-amount" type="number" min="0.01" step="0.01" class="form-control" formControlName="amount" (input)="onAmountInput()"
+            [class.is-invalid]="invalid('amount')" />
+          <div class="form-text">Sugerido: precio pactado × ciclos.</div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="pay-method">Medio <span class="erp-required">*</span></label>
+          <ng-select labelForId="pay-method" [items]="methods" bindLabel="name" bindValue="id" formControlName="method" [clearable]="false" />
+        </div>
+        <div class="col-md-8">
+          <label class="form-label" for="pay-operation">N.º de operación</label>
+          <input id="pay-operation" class="form-control text-uppercase" formControlName="operationNumber" autocomplete="off"
+            placeholder="Del banco, Yape o Plin (no se acepta repetido)" />
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="pay-notes">Notas</label>
+          <textarea id="pay-notes" class="form-control" rows="2" formControlName="notes" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+      <p class="form-text mb-0 mt-2">Un pago no se edita: si se registró mal, se anula (con motivo) y se registra de nuevo.</p>
+    </section>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="save()">
+    @if (saving()) {<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>}
+    Registrar pago
+  </button>
+</div>

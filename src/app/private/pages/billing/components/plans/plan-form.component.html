@@ -1,0 +1,125 @@
+<div class="modal-header">
+  <h5 class="modal-title color-modal-title"><em class="feather icon-layers"></em>{{ planId ? 'Editar' : 'Nuevo' }} plan</h5>
+  <button type="button" class="btn-close" aria-label="Cerrar" (click)="activeModal.dismiss()"></button>
+</div>
+<div class="modal-body">
+  <form [formGroup]="form" class="erp-form" novalidate>
+    <p class="form-text mt-0 mb-3">Los campos marcados con <span class="erp-required">*</span> son obligatorios.</p>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-tag"></em>Plan</h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="plan-product">Producto <span class="erp-required">*</span></label>
+          <ng-select labelForId="plan-product" [items]="products" bindLabel="name" bindValue="id" formControlName="product" [clearable]="false" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-code">Código <span class="erp-required">*</span></label>
+          <input id="plan-code" class="form-control text-uppercase" formControlName="code" autocomplete="off" [class.is-invalid]="invalid('code')" />
+          @if (invalid('code')) {
+          <div class="invalid-feedback">Letras, números, guion y guion bajo (máx. 32).</div>
+          } @else {
+          <div class="form-text">Único por producto. Ej.: ERP-BASICO</div>
+          }
+        </div>
+        <div class="col-md-5">
+          <label class="form-label" for="plan-name">Nombre <span class="erp-required">*</span></label>
+          <input id="plan-name" class="form-control" formControlName="name" [class.is-invalid]="invalid('name')" />
+          @if (invalid('name')) {
+          <div class="invalid-feedback">Indique el nombre (máx. 100).</div>
+          }
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="plan-description">Descripción</label>
+          <textarea id="plan-description" class="form-control" rows="2" formControlName="description" placeholder="Opcional"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-dollar-sign"></em>Precio</h6>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label" for="plan-currency">Moneda <span class="erp-required">*</span></label>
+          <ng-select labelForId="plan-currency" [items]="currencies" bindLabel="name" bindValue="id" formControlName="currency" [clearable]="false" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-monthly">Precio mensual <span class="erp-required">*</span></label>
+          <input id="plan-monthly" type="number" min="0" step="0.01" class="form-control" formControlName="monthlyPrice" [class.is-invalid]="invalid('monthlyPrice')" />
+          <div class="form-text">Sin IGV.</div>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-yearly">Precio anual</label>
+          <input id="plan-yearly" type="number" min="0" step="0.01" class="form-control" formControlName="yearlyPrice" placeholder="No se vende anual" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-trial">Días de prueba</label>
+          <input id="plan-trial" type="number" min="0" max="90" class="form-control" formControlName="trialDays" [class.is-invalid]="invalid('trialDays')" />
+          <div class="form-text">0 a 90. Solo la primera vez por cliente.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-sliders"></em>Límites <small class="text-muted">(vacío = sin límite)</small></h6>
+      <div class="row g-3">
+        @if (isErp) {
+        <div class="col-md-3">
+          <label class="form-label" for="plan-companies">Empresas</label>
+          <input id="plan-companies" type="number" min="1" class="form-control" formControlName="maxCompanies" [class.is-invalid]="invalid('maxCompanies')" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-users">Usuarios</label>
+          <input id="plan-users" type="number" min="1" class="form-control" formControlName="maxUsers" [class.is-invalid]="invalid('maxUsers')" />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label" for="plan-branches">Sucursales</label>
+          <input id="plan-branches" type="number" min="1" class="form-control" formControlName="maxBranches" [class.is-invalid]="invalid('maxBranches')" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <div class="form-check erp-check-card w-100">
+            <input class="form-check-input" type="checkbox" formControlName="includesAi" id="plan-ai" />
+            <label class="form-check-label" for="plan-ai">Incluye IA</label>
+          </div>
+        </div>
+        }
+        <div class="col-md-3">
+          <label class="form-label" for="plan-order">Orden</label>
+          <input id="plan-order" type="number" min="0" class="form-control" formControlName="sortOrder" />
+        </div>
+      </div>
+    </section>
+
+    <section class="erp-form-section">
+      <h6 class="erp-form-section__title"><em class="feather icon-cloud"></em>API SUNAT <small class="text-muted">{{ isErp ? '(opcional: la API va incluida en este plan)' : '(plan que se aplica a las empresas del cliente)' }}</small></h6>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="plan-api">Plan de la API</label>
+          <select id="plan-api" class="form-select" formControlName="apiPlanSlug" [class.is-invalid]="invalid('apiPlanSlug')">
+            @if (isErp) { <option [ngValue]="null">Sin API incluida</option> } @else { <option [ngValue]="null">Seleccione…</option> }
+            @for (o of apiPlans; track o.value) { <option [ngValue]="o.value">{{ o.label }}</option> }
+          </select>
+          <div class="form-text">Se aplica solo a las empresas emisoras del cliente (free / pro / business).</div>
+        </div>
+        @if (hasApi) {
+        <div class="col-md-4">
+          <label class="form-label" for="plan-issuers">Empresas emisoras (RUC)</label>
+          <input id="plan-issuers" type="number" min="1" class="form-control" formControlName="maxIssuers" [class.is-invalid]="invalid('maxIssuers')" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="plan-docs">Comprobantes por mes</label>
+          <input id="plan-docs" type="number" min="1" class="form-control" formControlName="maxDocumentsPerMonth" [class.is-invalid]="invalid('maxDocumentsPerMonth')" />
+          <div class="form-text">Vacío = el cupo del plan de la API.</div>
+        </div>
+        }
+      </div>
+    </section>
+  </form>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss()">Cancelar</button>
+  <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="save()">
+    @if (saving()) {<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>}
+    Guardar
+  </button>
+</div>

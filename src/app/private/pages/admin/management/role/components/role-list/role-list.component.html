@@ -1,0 +1,19 @@
+<div class="row btn-page">
+  <div class="col-sm-12">
+    <div class="card">
+      <app-page-header icon="icon-shield" title="GESTIÓN DE ROLES Y PERMISOS"
+        subtitle="Roles de acceso, sus permisos y los menús que ve cada uno">
+        <button headerActions type="button" class="btn btn-primary" matTooltip="Agregar" (click)="openDialogRegister()">
+          <em class="feather icon-plus"></em>AGREGAR
+        </button>
+      </app-page-header>
+
+      <div class="card-body p-0">
+        <app-list-table-simple [service]="_roleService" [columns]="component.tableColumns"
+          [deleteSuccess]="deleteRole" [registerSuccess]="registerRole"
+          (actionTriggered)="onActionTriggered($event)" [actions]="tableActions" #listTable>
+        </app-list-table-simple>
+      </div>
+    </div>
+  </div>
+</div>

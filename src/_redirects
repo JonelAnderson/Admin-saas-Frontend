@@ -1,0 +1,5 @@
+# Consola de plataforma: solo si se publica en Netlify (lo recomendado es nginx en Coolify, detrás de VPN / lista de IP).
+# Reemplazar <API-CONSOLA> por el dominio de la API de la consola (nunca el del ERP) y quitar el "#" de las dos líneas.
+# /api/*        https://<API-CONSOLA>/api/:splat        200
+# /Usuarios/*   https://<API-CONSOLA>/Usuarios/:splat   200
+/*              /index.html                             200
