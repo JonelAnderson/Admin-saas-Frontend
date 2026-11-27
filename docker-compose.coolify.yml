@@ -12,6 +12,7 @@ services:
     networks:
       default:
       shared:
+        aliases: [platform-web]
 
 networks:
   shared:
